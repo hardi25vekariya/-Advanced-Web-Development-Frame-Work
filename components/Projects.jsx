@@ -6,8 +6,15 @@ import todoApp from "../assets/todo-app.jpg";
 import portfolio from "../assets/portfolio.png";
 
 import "./Projects.css";
+import { useState, useEffect } from "react";
+import Spinner from "./Spinner";
+import ErrorMessage from "./ErrorMessage";
+import RepoList from "./RepoList";
 
 function Projects() {
+  const [repos, setRepos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const projectsData = [
     {
       id: 1,
@@ -65,6 +72,46 @@ function Projects() {
     },
   ];
 
+  const fetchRepos = () => {
+    setLoading(true);
+    setError(null);
+    fetch("https://api.github.com/users/hardi25vekariya/repos")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to fetch repositories");
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setRepos(data);
+      })
+      .catch((err) => {
+        setError(err.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    fetchRepos();
+  }, []);
+  
+  if (loading) {
+    return <Spinner />;
+  }
+
+  if (error) {
+    return (
+      <div className="error-wrapper" style={{ textAlign: "center", marginBottom: "40px" }}>
+        <ErrorMessage message={error} />
+        <button className="retry-btn" onClick={fetchRepos}>
+          Retry
+        </button>
+      </div>
+    );
+  }
+
   return (
     <section className="projects-section">
       <div className="section-container">
@@ -105,6 +152,13 @@ function Projects() {
             </div>
           ))}
         </div>
+        <hr />
+
+        <h2 className="section-title">
+          GitHub <span>Repositories</span>
+        </h2>
+
+        <RepoList repos={repos} />
       </div>
     </section>
   );
