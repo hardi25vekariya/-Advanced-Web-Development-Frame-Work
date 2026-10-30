@@ -4,10 +4,13 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build-and-test:
-    name: Backend Build and Test
+    name: Build and Test
     runs-on: ubuntu-latest
 
     steps:
@@ -18,13 +21,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: "npm"
-          cache-dependency-path: backend/package.json
 
-      - name: Install backend dependencies
-        working-directory: backend
+      - name: Install dependencies
         run: npm install
 
       - name: Execute automated tests
-        working-directory: backend
         run: npm test
