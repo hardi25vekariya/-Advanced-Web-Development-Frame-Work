@@ -6,23 +6,25 @@ on:
       - main
 
 jobs:
-  test:
-    name: Backend API Testing
+  build-and-test:
+    name: Backend Build and Test
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 18
         uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: "npm"
+          cache-dependency-path: backend/package.json
 
-      - name: Install Backend Dependencies
+      - name: Install backend dependencies
+        working-directory: backend
         run: npm install
-        working-directory: ./backend
 
-      - name: Run Backend Tests
+      - name: Execute automated tests
+        working-directory: backend
         run: npm test
-        working-directory: ./backend
